@@ -49,6 +49,7 @@ enum eDOORSTATUS
 // constants
 //---------------------------------------------------------------
 String mVersionNumber        = "-------VERSION 0.4b-------";
+// TODO: dont forget to put in WIFI credentials here
 const char AUTH[]            = "";
 const char WIFI_SSID[]       = "";
 const char WIFI_PASS[]       = "";
