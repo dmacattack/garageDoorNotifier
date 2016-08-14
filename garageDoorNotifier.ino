@@ -4,6 +4,7 @@
 #include <EEPROM.h>
 #include <ESP8266WiFi.h>
 #include <BlynkSimpleEsp8266.h>
+#include "WifiCredentials.h"
 
 //---------------------------------------------------------------
 // macros
@@ -48,13 +49,7 @@ enum eDOORSTATUS
 //---------------------------------------------------------------
 // constants
 //---------------------------------------------------------------
-String mVersionNumber        = "-------VERSION 0.4b-------";
-// TODO: dont forget to put in WIFI credentials here
-const char AUTH[]            = "";
-const char WIFI_SSID[]       = "";
-const char WIFI_PASS[]       = "";
-const char EMAIL_ADDR[]      = "";
-const char EMAIL_SUBJ[]      = "ESP8266 - GARAGE DOOR";
+String mVersionNumber        = "-------VERSION 0.5-------";
 const Int32 LED_PIN          = 5;    // ESP8266 onboard, green LED
 const Int32 TOGGLE_DURATION  = 1000; // full second
 const Int32 US_PIN           = 15; // ultrasonic sensor Pulse Width pin
@@ -81,6 +76,8 @@ UInt32 mSenVal      = 0;
 UInt32 mSenThreshold   = 0; 
 // state of the garage door
 eDOORSTATUS mDoorStatus = eDOOR_UNKNOWN;
+// cheater way for hysteresis
+bool doorStatusHyst = false;
 // terminal for status updates
 WidgetTerminal mTerminal(V10);
 
@@ -344,18 +341,30 @@ void readSen()
 
     if (doorStatus != mDoorStatus) 
     {
+        String msg = String("!!! " + getString(mDoorStatus) + " ---> " + getString(doorStatus) + " !!!" );      
+        DBG_PRINT("readSen", msg );
       
-      // send event to the app only if the status changed
-      String msg = String("!!! " + getString(mDoorStatus) + " ---> " + getString(doorStatus) + " !!!" );      
-      DBG_PRINT("readSen", msg );
-      
-      mDoorStatus = doorStatus;
-      Blynk.virtualWrite(V5, getString(mDoorStatus) );
-      Blynk.notify(msg);
+      if (doorStatusHyst == true)
+      {
+        // send event to the app only if the status changed
+        DBG_PRINT("readSen", "hysteresis is true, send the notification");
+        mTerminal.println(">> " + str + ". Send notification" );
+        
+        mDoorStatus = doorStatus;
+        Blynk.virtualWrite(V5, getString(mDoorStatus) );
+        Blynk.notify(msg);        
+      }
+      else
+      {
+        DBG_PRINT("readSen", "hysteresis is false, do one more check");
+        mTerminal.println(">> " + str + ". hysteresis check" );
+        doorStatusHyst = true;
+      }
     }
     else
     {
-      //status is the same. do nothing
+      //status is the same. reset the hysteresis if it happened to be triggered
+      doorStatusHyst = false;
     }
   }
   mTerminal.flush();
