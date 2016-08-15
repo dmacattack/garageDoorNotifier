@@ -317,13 +317,13 @@ void readSen()
 
   if (mSenVal == 0)
   {
-    String str = String(millis()/1000) + ") timeout " + String(microsecondsToCentimeters(mSenVal)) + " cm" ;
+    String str = getUpTime() + ") timeout " + String(microsecondsToCentimeters(mSenVal)) + " cm" ;
     DBG_PRINT("readSen", str);
     mTerminal.println(">> " + str );
   }
   else
   {
-    String str = String(millis()/1000) + ") sensor = " + String(microsecondsToCentimeters(mSenVal)) + " cm";
+    String str = getUpTime() + ") sensor = " + String(microsecondsToCentimeters(mSenVal)) + " cm";
     DBG_PRINT("readSen" , str );
     mTerminal.println(">> " + str );
     eDOORSTATUS doorStatus = eDOOR_UNKNOWN;
@@ -341,7 +341,7 @@ void readSen()
 
     if (doorStatus != mDoorStatus) 
     {
-        String msg = String("!!! " + getString(mDoorStatus) + " ---> " + getString(doorStatus) + " !!!" );      
+        String msg = String( getUpTime() + ") !!! " + getString(mDoorStatus) + " ---> " + getString(doorStatus) + " !!!" );      
         DBG_PRINT("readSen", msg );
       
       if (doorStatusHyst == true)
@@ -368,6 +368,20 @@ void readSen()
     }
   }
   mTerminal.flush();
+}
+
+
+//---------------------------------------------------------------
+// getUpTime
+// return a string of the hh:mm:ss of the uptime 
+//---------------------------------------------------------------
+String getUpTime()
+{
+  UInt32 ms = millis();
+  UInt32 secs = ( ms/ 1000 ) % 60;
+  UInt32 mins = ( ms/(1000*60) ) % 60;
+  
+  return upTime;
 }
 
 //---------------------------------------------------------------

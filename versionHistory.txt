@@ -1,3 +1,4 @@
 v0.5
 - add hysteresis to the notification. I got a lot of false positives due to dust?/sensor errors
 - add include for wifi credentials
+- add a getUpTime function for sensical debug print messages
