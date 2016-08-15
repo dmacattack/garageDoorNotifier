@@ -380,6 +380,8 @@ String getUpTime()
   UInt32 ms = millis();
   UInt32 secs = ( ms/ 1000 ) % 60;
   UInt32 mins = ( ms/(1000*60) ) % 60;
+  UInt32 hours =( ms/ (1000*60*60) ) %60;
+  String upTime = String(hours) + ":" + String(mins) + ":" + String(secs) ;
   
   return upTime;
 }
